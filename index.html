@@ -74,11 +74,14 @@
         anon_color = 'rgb(46, 204, 113)',
         edit_color = '#fff',
         sound_totals = 51,
-        total_edits = 0;
+        total_trans = 0;
 
     /* Languages
        ========= */
 
+    var currs = {
+        'USD': ['US Dollar'],
+    };
     var langs = {
         'en': ['English', 'ws://wikimon.hatnote.com:9000'],
         'de': ['German', 'ws://wikimon.hatnote.com:9010'],
@@ -230,9 +233,9 @@
         for (lang in langs) {
             if (langs.hasOwnProperty(lang)) {
                 if (lang == 'wikidata') {
-                    $('#lang-boxes').append('<p><input type="checkbox" name="' + langs[lang][0] + '" id="' + lang + '-enable"/><label for="' + lang + '-enable">' + langs[lang][0] + ' <span class="conStatus" id="' + lang + '-status"></span></label></p>')
+                    $('#curr-boxes').append('<p><input type="checkbox" name="' + langs[lang][0] + '" id="' + lang + '-enable"/><label for="' + lang + '-enable">' + langs[lang][0] + ' <span class="conStatus" id="' + lang + '-status"></span></label></p>')
                 } else {
-                    $('#lang-boxes').append('<p><input type="checkbox" name="' + langs[lang][0] + '" id="' + lang + '-enable"/><label for="' + lang + '-enable">' + langs[lang][0] + ' Wikipedia <span class="conStatus" id="' + lang + '-status"></span></label></p>')
+                    $('#curr-boxes').append('<p><input type="checkbox" name="' + langs[lang][0] + '" id="' + lang + '-enable"/><label for="' + lang + '-enable">' + langs[lang][0] + ' Wikipedia <span class="conStatus" id="' + lang + '-status"></span></label></p>')
                 }
                 SOCKETS[lang] = new wikipediaSocket.init(langs[lang][1], lang, svg);
                 var box = $('#' + lang + '-enable');
@@ -266,8 +269,10 @@
       <span class="about-link">
         <span id="volumeWrapper" class="interface">
           <span id="volumeSlider" class="noUiSlider"></span>
-        </span><a id="about-link" href="">about</a> &amp; <a href="http://blog.hatnote.com/" target="_blank">blog</a> &amp; <a href="https://itunes.apple.com/us/app/listen-to-wikipedia/id832934300" target="_blank">app</a></span>
-      <h1>Listen to Wikipedia</h1>
+        </span>
+        <a id="about-link" href="">about</a>
+    </span>
+      <h1>Listen to Ripple</h1>
     </div>
     <div id='area'></div>
     <div id='content'>
@@ -278,7 +283,6 @@
                 </ul>
                  <div class="note">
                   <p id="edit_counter"></p>
-                  <p>For more, see Wikipedia's RecentChanges pages for <a href="http://www.wikipedia.org/">each language</a>.</p>
                 </div>
             </div>
         </div>
@@ -289,14 +293,10 @@
         <label for='welcome'>Hide new user announcements</label></p>
         <p><input type="checkbox" name="titles" id="titles">
         <label for='titles'>Hide article titles</label></p>
-        <h3>Languages</h3>
-        <div id='lang-boxes'> </div>
+        <h3>Currencies</h3>
+        <div id='curr-boxes'> </div>
         <div class='clear'><br/></div>
         <h3>About</h3>
-        <p><a href='http://blog.hatnote.com/post/56856315107/listen-to-wikipedia'>Read more</a> about this project.</p>
-        <p>Listen to the sound of Wikipedia's recent changes feed. Bells indicate additions and string plucks indicate subtractions. Pitch changes according to the size of the edit; the larger the edit, the deeper the note. Green circles show edits from <a href='http://en.wikipedia.org/wiki/Wikipedia:User_access_levels#Unregistered_users'>unregistered contributors</a>, and purple circles mark edits performed by <a href='http://en.wikipedia.org/wiki/Wikipedia:Bots'>automated bots</a>. You may see announcements for new users as they join the site, punctuated by a string swell. You can welcome him or her by clicking the blue banner and adding a note on their talk page.</p>
-        <p>This project is built using <a href='http://d3js.org'>D3</a> and <a href='https://github.com/goldfire/howler.js'>HowlerJS</a>. It is based on <a href='http://www.listentobitcoin.com/'>Listen to Bitcoin</a> by <a href='https://github.com/MaxLaumeister'>Maximillian Laumeister</a>. Our source is <a href='https://github.com/hatnote/listen-to-wikipedia'>available on GitHub</a>, and you can read more about this project.</p>
-        <p>Built by <a href='http://github.com/slaporte'>Stephen LaPorte</a> and <a href='http://github.com/mahmoud'>Mahmoud Hashemi</a>.
     </div>
 </body>
 </html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<meta charset="utf-8" />
+<script language="javascript" type="text/javascript">
+var wsUri = "wss://s1.ripple.com";
+var output;
+var cancels = {};
+function init() {
+  output = document.getElementById("output");
+  testWebSocket();
+}
+function testWebSocket() {
+  websocket = new WebSocket(wsUri);
+  websocket.onopen = function(evt) { onOpen(evt) };
+  websocket.onclose = function(evt) { onClose(evt) };
+  websocket.onmessage = function(evt) { onMessage(evt) };
+  websocket.onerror = function(evt) { onError(evt) };
+}
+function onOpen(evt) {
+  doSend("{\"command\":\"subscribe\",\"id\":0,\"streams\":[\"transactions\"]}");
+}
+function onClose(evt) {
+  writeToScreen("DISCONNECTED");
+}
+function onMessage(evt) {
+  var data = JSON.parse(evt.data);
+  if(data["id"] == 1)
+  {
+    var id = data["result"]["account"];
+    var usercancels = cancels[id];
+    for (var i = 0; i < data["result"]["offers"].length; i++)
+    {
+      var cancel = data["result"]["offers"][i];
+      var index = usercancels.indexOf(cancel["seq"]);
+      if(index !=-1)
+      {
+        delete usercancels[index];
+        if(usercancels.length == 1) delete cancels[id];
+        var takerGets = convert(cancel["taker_gets"]);
+        var takerPays = convert(cancel["taker_pays"]);
+        writeToScreen(id+" cancelled an offer: "+ takerGets["value"] +" "+takerGets["currency"] +" for "+takerPays["value"]+" "+takerGets["currency"]);
+      }
+    }
+    return;
+  }
+  //console.log(data);
+  data = data["transaction"]
+  /*
+  delete data["engine_result"];
+  delete data["engine_result_code"]
+  delete data["engine_result_message"]
+  delete data["ledger_hash"]
+  delete data["ledger_index"]
+  delete data["meta"]
+  delete data["type"]
+  delete data["validated"]
+  delete data["status"]*/
+  delete data["Fee"]
+  delete data["Flags"]
+  //delete data["Account"]
+  delete data["Sequence"]
+  delete data["SigningPubKey"]
+  delete data["TxnSignature"]
+  delete data["date"]
+  delete data["hash"]
+  //delete data["OfferSequence"]
+  delete data["LastLedgerSequence"]
+  var type = data["TransactionType"];
+  if (type=="OfferCancel")
+  {
+    var whole = JSON.parse(evt.data);
+    var toSend = {"command": "account_offers", "ledger_index":(whole["ledger_index"]-1), "account":data["Account"], "id":1};
+    if (data["Account"] in cancels)
+    {
+      cancels[data["Account"]].push(data["OfferSequence"])
+    }
+    else cancels[data["Account"]] = [data["OfferSequence"]];
+    websocket.send(JSON.stringify(toSend));
+  }
+  else if (type=="Payment")
+  {
+    var amount = convert(data["Amount"]);
+    writeToScreen(data["Account"] + " paid " + data["Destination"] + " "+ amount["value"]+" "+amount["currency"]+'.');
+  }
+  else if (type=="OfferCreate")
+  {
+    var takerPays = convert(data["TakerPays"]);
+    var takerGets = convert(data["TakerGets"]);
+    writeToScreen(data["Account"] + " offers " + takerGets["value"]+" "+takerGets["currency"] + " for "+ takerPays["value"]+" "+takerPays["currency"]+'.');
+  }
+  else if (type == "TrustSet")
+  {
+    var trusted = data["LimitAmount"];
+    writeToScreen(data["Account"] + " trusts " + trusted["issuer"]+" to hold on to "+trusted["value"] +" "+trusted["currency"]+'.');
+  }
+  else if (type == "AccountSet")
+  {
+    writeToScreen(data["Account"] + " changed his/her account settings.");
+  }
+  else
+  {
+      writeToScreen('<span style="color: blue;">' + JSON.stringify(data)+'</span>');
+      console.log("NEW: "+JSON.stringify(data));
+  }
+  //websocket.close();
+}
+function onError(evt) {
+  writeToScreen('<span style="color: red;">ERROR:</span> ' + evt.data);
+}
+function doSend(message) {
+  websocket.send(message);
+}
+function writeToScreen(message) {
+  var pre = document.createElement("p");
+  pre.style.wordWrap = "break-word";
+  pre.innerHTML = '<span>'+message+'</span>';
+  output.appendChild(pre);
+}
+function convert(amount) {
+  if (typeof(amount) == "object") return amount;
+  else return {"currency":"XRP", "value":amount};
+}
+window.addEventListener("load", init, false);
+</script>
+<div id="output"></div>

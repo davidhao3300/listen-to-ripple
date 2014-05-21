@@ -131,7 +131,7 @@ label {
     border-bottom: 1px dashed #ccc;
 }
 
-#lang-boxes p {
+#curr-boxes p {
     float: left;
     width: 20em;
     font-size: .9em;

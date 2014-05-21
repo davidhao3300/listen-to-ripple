@@ -1,9 +1,9 @@
 function wp_action(data, svg_area) {
-    total_edits += 1;
-    if (total_edits == 1) {
-        $('#edit_counter').html('You have seen <span>' + total_edits + ' edit</span>.');
+    total_trans += 1;
+    if (total_trans == 1) {
+        $('#edit_counter').html('You have seen <span>' + total_trans + ' edit</span>.');
     } else {
-        $('#edit_counter').html('You have seen a total of <span>' + insert_comma(total_edits) + ' edits</span>.');
+        $('#edit_counter').html('You have seen a total of <span>' + insert_comma(total_trans) + ' edits</span>.');
     }
     var now = new Date();
     edit_times.push(now);
